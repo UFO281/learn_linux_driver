@@ -61,6 +61,8 @@ static void __iomem *GPIO01_GDIR = NULL;
 void led_switch(u8 sta)
 {
 
+	printk("led_switch  5! \r\n");
+
     u32 value =0;
     if (sta == LED_ON)
     {
@@ -91,6 +93,8 @@ void led_switch(u8 sta)
 static int led_open(struct inode *inode, struct file *filp)
 {
 
+	printk("led_open  2! \r\n");
+
 
     return 0;
 	
@@ -113,6 +117,8 @@ static ssize_t led_read(    struct file *filp,
                             loff_t *offt
                         )
 {   
+
+	printk("led_read  3! \r\n");
 
     // int retvalue = 0; 
 
@@ -153,6 +159,8 @@ static ssize_t led_write(   struct file *filp,
                             loff_t *offt
                         )
 {
+	printk("led_write start 4! \r\n");
+
     int ret = 0;
     unsigned char databuf[1];
     unsigned char ledstat;
@@ -170,12 +178,17 @@ static ssize_t led_write(   struct file *filp,
     if (ledstat == LED_ON)
     {
         led_switch(LED_ON);
+        printk("len on! \r\n");
+
     }
     else if (ledstat == LED_OFF)
     {
         led_switch(LED_OFF);
     }
     
+
+	printk("led_write endoff 4! \r\n");
+
     return 0;     
 
 }
@@ -193,7 +206,7 @@ static ssize_t led_write(   struct file *filp,
 static int led_release(struct inode *inode, struct file *filp)
 {
 
-	printk("led release! \r\n");
+	printk("led release! 7 \r\n");
 
     return 0;
 
@@ -224,6 +237,9 @@ static struct file_operations led_fops = {
  */
 static int __init wlsled_init(void)
 {
+
+	printk("wlsled_init start 1! \r\n");
+
 
     int ret = 0;
     unsigned int value = 0;
@@ -288,6 +304,8 @@ static int __init wlsled_init(void)
         printk("wlsled_init() register succesfull!\r\n");
     }
        
+	printk("wlsled_init endoff 1! \r\n");
+    
 
     return 0;
 
@@ -303,6 +321,9 @@ static int __init wlsled_init(void)
  */
 static void __exit wlsdev_exit(void)
 {
+
+    printk("wlsdev_exit  6! \r\n");
+
 
 	/*取消虚拟映射*/
 	iounmap(IMX6U_CCM_CCGR1);
