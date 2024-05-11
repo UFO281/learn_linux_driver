@@ -217,6 +217,8 @@ static struct file_operations led_fops = {
 
 /**
  * @brief 驱动入口函数
+ *      
+ *      配置GPIO属性；eg: 开启GPIO外设时钟，输入/输出模式，上下拉，速度等等
  * 
  * @return int 
  */
@@ -244,10 +246,11 @@ static int __init wlsled_init(void)
 	/*3. 设置GPIO01_IO03的复用功能
 		复用为GPIO1_IO03，最后设置IO属性
 	*/	
-
 	writel(5,SW_MUX_GPIO1_IO03);
 	
-	/*寄存器SW_PAD_GPIO1_IO03 设置IO属性*/
+
+	/*寄存器SW_PAD_GPIO1_IO03 设置IO属性
+    上下拉，输出速度等等*/
 	writel(0x10B0,SW_PAD_GPIO1_IO03);	
 
 
@@ -255,10 +258,10 @@ static int __init wlsled_init(void)
 	value = readl(GPIO01_GDIR);
 	value &= ~(1<<3);/*清楚以前的设置*/
 	value |= (1<<3); /*设置为输出*/
-	writel(value,GPIO01_DR);
+	writel(value,GPIO01_GDIR);
+    
 
-
-	/*5. 默认关闭LED*/
+	/*5. 默认关闭LED 输出高电平*/
 	value = readl(GPIO01_DR);
 	value |= (1<<3);
 	writel(value,GPIO01_DR);
@@ -268,7 +271,7 @@ static int __init wlsled_init(void)
      * @brief 函数用于注册字符设备
      * 
      * @param major 主设备号，Linux 下每个设备都有一个设备号，设备号分为主设备号和次设备号两
-                    部分，关于设备号后面会详细讲解。
+            部分，关于设备号后面会详细讲解。
     * @param name 设备名字，指向一串字符串。
     * @param fops 结构体 file_operations 类型指针，指向设备的操作函数集合变量。
     * @return int 
