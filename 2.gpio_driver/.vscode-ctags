@@ -47,7 +47,6 @@ CC	app/Makefile	/^CC=arm-linux-gnueabihf-gcc$/;"	m
 CFLAGS	app/Makefile	/^CFLAGS= -Wall -g -Wextra -std=c11$/;"	m
 CMM_CCGR1_BASE	gpio_wls.c	/^#define CMM_CCGR1_BASE /;"	d	file:
 CURRENT_PATH	Makefile	/^CURRENT_PATH := $(shell pwd) $/;"	m
-Char_Dev_Base_Major	gpio_wls.c	/^#define Char_Dev_Base_Major /;"	d	file:
 Char_Dev_Base_Name	gpio_wls.c	/^#define Char_Dev_Base_Name /;"	d	file:
 GPIO01_DR	gpio_wls.c	/^static void __iomem *GPIO01_DR = NULL;$/;"	v	typeref:typename:void __iomem *	file:
 GPIO01_DR_BASE	gpio_wls.c	/^#define GPIO01_DR_BASE /;"	d	file:
@@ -55,26 +54,28 @@ GPIO01_GDIR	gpio_wls.c	/^static void __iomem *GPIO01_GDIR = NULL;$/;"	v	typeref:
 GPIO01_GDIR_BASE	gpio_wls.c	/^#define GPIO01_GDIR_BASE /;"	d	file:
 IMX6U_CCM_CCGR1	gpio_wls.c	/^static void __iomem *IMX6U_CCM_CCGR1 = NULL;$/;"	v	typeref:typename:void __iomem *	file:
 KERNELDIR	Makefile	/^KERNELDIR := \/home\/wls\/linux\/os_src\/linux-imx-rel_imx_4.1.15_2.1.0_ga$/;"	m
+LED_MAJOR	gpio_wls.c	/^#define LED_MAJOR /;"	d	file:
 LED_OFF	gpio_wls.c	/^#define LED_OFF /;"	d	file:
 LED_ON	gpio_wls.c	/^#define LED_ON /;"	d	file:
 SW_MUX_GPIO1_IO03	gpio_wls.c	/^static void __iomem *SW_MUX_GPIO1_IO03 = NULL;$/;"	v	typeref:typename:void __iomem *	file:
 SW_MUX_GPIO1_IO03_BASE	gpio_wls.c	/^#define SW_MUX_GPIO1_IO03_BASE /;"	d	file:
+SW_PAD_GPIO1_IO03	gpio_wls.c	/^static void __iomem *SW_PAD_GPIO1_IO03 = NULL;$/;"	v	typeref:typename:void __iomem *	file:
 SW_PAD_GPIO1_IO03_BASE	gpio_wls.c	/^#define SW_PAD_GPIO1_IO03_BASE /;"	d	file:
 TARGET	app/Makefile	/^TARGET = app_gpio$/;"	m
 all	app/Makefile	/^all: $(TARGET)$/;"	t
 appwlsmain.o	app/Makefile	/^appwlsmain.o: appwlsmain.c$/;"	t
 build	Makefile	/^build: kernel_modules$/;"	t
-chrdev_base_fops	gpio_wls.c	/^static struct file_operations chrdev_base_fops = {$/;"	v	typeref:struct:file_operations	file:
 clean	Makefile	/^clean:$/;"	t
 clean	app/Makefile	/^clean:$/;"	t
 kernel_modules	Makefile	/^kernel_modules:$/;"	t
+led_fops	gpio_wls.c	/^static struct file_operations led_fops = {$/;"	v	typeref:struct:file_operations	file:
 led_open	gpio_wls.c	/^static int led_open(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
 led_read	gpio_wls.c	/^static ssize_t led_read(    struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
 led_release	gpio_wls.c	/^static int led_release(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
 led_switch	gpio_wls.c	/^void led_switch(u8 sta)$/;"	f	typeref:typename:void
-led_write	gpio_wls.c	/^static ssize_t led_write(  struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
+led_write	gpio_wls.c	/^static ssize_t led_write(   struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
 main	app/app_gpio.c	/^int main(int count,char **str)$/;"	f	typeref:typename:int
 obj-m	Makefile	/^obj-m := gpio_wls.o $/;"	m
 usrdata	app/app_gpio.c	/^static char usrdata[] = {"usr data!"};$/;"	v	typeref:typename:char[]	file:
 wlsdev_exit	gpio_wls.c	/^static void __exit wlsdev_exit(void)$/;"	f	typeref:typename:void __exit	file:
-wlsdev_init	gpio_wls.c	/^static int __init wlsdev_init(void)$/;"	f	typeref:typename:int __init	file:
+wlsled_init	gpio_wls.c	/^static int __init wlsled_init(void)$/;"	f	typeref:typename:int __init	file:

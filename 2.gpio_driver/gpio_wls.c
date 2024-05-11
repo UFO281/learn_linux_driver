@@ -60,7 +60,6 @@ static void __iomem *GPIO01_GDIR = NULL;
  */
 void led_switch(u8 sta)
 {
-
     u32 value =0;
     if (sta == LED_ON)
     {
