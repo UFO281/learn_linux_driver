@@ -60,7 +60,6 @@ static void __iomem *GPIO01_GDIR = NULL;
  */
 void led_switch(u8 sta)
 {
-
     u32 value =0;
     if (sta == LED_ON)
     {
@@ -236,34 +235,11 @@ static int __init wlsled_init(void)
 
     /*2. 使能GPIO1时钟*/
     value = readl(IMX6U_CCM_CCGR1);
-    value &= ~(3<<26); /* clear before setting*/
-	value |= (3<<26); /*set new value */
-	writel(value,IMX6U_CCM_CCGR1);
-
-
-	/*3. 设置GPIO01_IO03的复用功能
-		复用为GPIO1_IO03，最后设置IO属性
-	*/	
-
-	writel(5,SW_MUX_GPIO1_IO03);
+    value &= ~(3<<26);
 	
-	/*寄存器SW_PAD_GPIO1_IO03 设置IO属性*/
-	writel(0x10B0,SW_PAD_GPIO1_IO03);	
-
-
-	/*4. 设置GPIO1_IO03为输出功能*/
-	value = readl(GPIO01_GDIR);
-	value &= ~(1<<3);/*清楚以前的设置*/
-	value |= (1<<3); /*设置为输出*/
-	writel(value,GPIO01_DR);
-
-
-	/*5. 默认关闭LED*/
-	value = readl(GPIO01_DR);
-	value |= (1<<3);
-	writel(value,GPIO01_DR);
-
 	
+	
+
     /**
      * @brief 函数用于注册字符设备
      * 
@@ -273,12 +249,11 @@ static int __init wlsled_init(void)
     * @param fops 结构体 file_operations 类型指针，指向设备的操作函数集合变量。
     * @return int 
     */
-    ret = register_chrdev(LED_MAJOR,Char_Dev_Base_Name,&led_fops);
+    ret = register_chrdev(LED_MAJOR,"chartest",&led_fops);
     if ( ret<0 )
     {
         /*char device register failed!*/
-        printk("led register failed!\r\n");
-		return -EIO;
+        printk("chardev register failed!\r\n");
     }
     else
     {
@@ -287,8 +262,6 @@ static int __init wlsled_init(void)
        
 
     return 0;
-
-	
 }
 
 
@@ -300,14 +273,6 @@ static int __init wlsled_init(void)
  */
 static void __exit wlsdev_exit(void)
 {
-
-	/*取消虚拟映射*/
-	iounmap(IMX6U_CCM_CCGR1);
-	iounmap(SW_MUX_GPIO1_IO03);
-	iounmap(SW_PAD_GPIO1_IO03);
-	iounmap(GPIO01_DR);
-	iounmap(GPIO01_GDIR);
-
 
     /**
      * @brief 函数用户注销字符设备
