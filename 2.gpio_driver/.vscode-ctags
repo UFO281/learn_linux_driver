@@ -20,13 +20,17 @@
 !_TAG_KIND_DESCRIPTION!C	t,typedef	/typedefs/
 !_TAG_KIND_DESCRIPTION!C	u,union	/union names/
 !_TAG_KIND_DESCRIPTION!C	v,variable	/variable definitions/
+!_TAG_KIND_DESCRIPTION!Make	I,makefile	/makefiles/
+!_TAG_KIND_DESCRIPTION!Make	m,macro	/macros/
+!_TAG_KIND_DESCRIPTION!Make	t,target	/targets/
 !_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
 !_TAG_OUTPUT_VERSION	0.0	/current.age/
 !_TAG_PARSER_VERSION!C	1.1	/current.age/
+!_TAG_PARSER_VERSION!Make	0.0	/current.age/
 !_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
-!_TAG_PROC_CWD	/home/wls/linux/nfs/rootfs/lib/modules/4.1.15/1.var_chardev/	//
+!_TAG_PROC_CWD	/home/wls/linux/Driver/2.gpio_driver/	//
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
@@ -36,16 +40,41 @@
 !_TAG_ROLE_DESCRIPTION!C!header	system	/system header/
 !_TAG_ROLE_DESCRIPTION!C!macro	undef	/undefined/
 !_TAG_ROLE_DESCRIPTION!C!struct	foreigndecl	/declared in foreign languages/
-Char_Dev_Base_Major	wlsmain.c	/^#define Char_Dev_Base_Major /;"	d	file:
-Char_Dev_Base_Name	wlsmain.c	/^#define Char_Dev_Base_Name /;"	d	file:
-chardev_release	wlsmain.c	/^static int chardev_release (struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
-chartest_write	wlsmain.c	/^static ssize_t chartest_write(  struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
-chrdev_base_fops	wlsmain.c	/^static struct file_operations chrdev_base_fops = {$/;"	v	typeref:struct:file_operations	file:
-kernel_buf	wlsmain.c	/^static char kernel_buf[] = {"kernel data!"};$/;"	v	typeref:typename:char[]	file:
-read_buf	wlsmain.c	/^static char read_buf[100];   \/*读缓冲区*\/$/;"	v	typeref:typename:char[100]	file:
-register_chrdev1	wlsmain.c	/^static inline int register_chrdev1(  unsigned int major, $/;"	f	typeref:typename:int	file:
-retvalue	wlsmain.c	/^    int retvalue = 0; $/;"	v	typeref:typename:int
-unregister_chrdev	wlsmain.c	/^static inline void unregister_chrdev(unsigned int major, const char *name)$/;"	f	typeref:typename:void	file:
-wlsdev_exit	wlsmain.c	/^static int __exit wlsdev_exit(void)$/;"	f	typeref:typename:int __exit	file:
-wlsdev_init	wlsmain.c	/^static int __int wlsdev_init(void)$/;"	f	typeref:typename:int __int	file:
-write_buf	wlsmain.c	/^static char write_buf[100];   \/*写缓冲区*\/$/;"	v	typeref:typename:char[100]	file:
+!_TAG_ROLE_DESCRIPTION!Make!makefile	included	/included/
+!_TAG_ROLE_DESCRIPTION!Make!makefile	optional	/optionally included/
+$(TARGET)	app/Makefile	/^$(TARGET): app_gpio.o$/;"	t
+CC	app/Makefile	/^CC=arm-linux-gnueabihf-gcc$/;"	m
+CFLAGS	app/Makefile	/^CFLAGS= -Wall -g -Wextra -std=c11$/;"	m
+CMM_CCGR1_BASE	gpio_wls.c	/^#define CMM_CCGR1_BASE /;"	d	file:
+CURRENT_PATH	Makefile	/^CURRENT_PATH := $(shell pwd) $/;"	m
+Char_Dev_Base_Major	gpio_wls.c	/^#define Char_Dev_Base_Major /;"	d	file:
+Char_Dev_Base_Name	gpio_wls.c	/^#define Char_Dev_Base_Name /;"	d	file:
+GPIO01_DR	gpio_wls.c	/^static void __iomem *GPIO01_DR = NULL;$/;"	v	typeref:typename:void __iomem *	file:
+GPIO01_DR_BASE	gpio_wls.c	/^#define GPIO01_DR_BASE /;"	d	file:
+GPIO01_GDIR	gpio_wls.c	/^static void __iomem *GPIO01_GDIR = NULL;$/;"	v	typeref:typename:void __iomem *	file:
+GPIO01_GDIR_BASE	gpio_wls.c	/^#define GPIO01_GDIR_BASE /;"	d	file:
+IMX6U_CCM_CCGR1	gpio_wls.c	/^static void __iomem *IMX6U_CCM_CCGR1 = NULL;$/;"	v	typeref:typename:void __iomem *	file:
+KERNELDIR	Makefile	/^KERNELDIR := \/home\/wls\/linux\/os_src\/linux-imx-rel_imx_4.1.15_2.1.0_ga$/;"	m
+LED_OFF	gpio_wls.c	/^#define LED_OFF /;"	d	file:
+LED_ON	gpio_wls.c	/^#define LED_ON /;"	d	file:
+SW_MUX_GPIO1_IO03	gpio_wls.c	/^static void __iomem *SW_MUX_GPIO1_IO03 = NULL;$/;"	v	typeref:typename:void __iomem *	file:
+SW_MUX_GPIO1_IO03_BASE	gpio_wls.c	/^#define SW_MUX_GPIO1_IO03_BASE /;"	d	file:
+SW_PAD_GPIO1_IO03_BASE	gpio_wls.c	/^#define SW_PAD_GPIO1_IO03_BASE /;"	d	file:
+TARGET	app/Makefile	/^TARGET = app_gpio$/;"	m
+all	app/Makefile	/^all: $(TARGET)$/;"	t
+appwlsmain.o	app/Makefile	/^appwlsmain.o: appwlsmain.c$/;"	t
+build	Makefile	/^build: kernel_modules$/;"	t
+chrdev_base_fops	gpio_wls.c	/^static struct file_operations chrdev_base_fops = {$/;"	v	typeref:struct:file_operations	file:
+clean	Makefile	/^clean:$/;"	t
+clean	app/Makefile	/^clean:$/;"	t
+kernel_modules	Makefile	/^kernel_modules:$/;"	t
+led_open	gpio_wls.c	/^static int led_open(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
+led_read	gpio_wls.c	/^static ssize_t led_read(    struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
+led_release	gpio_wls.c	/^static int led_release(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
+led_switch	gpio_wls.c	/^void led_switch(u8 sta)$/;"	f	typeref:typename:void
+led_write	gpio_wls.c	/^static ssize_t led_write(  struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
+main	app/app_gpio.c	/^int main(int count,char **str)$/;"	f	typeref:typename:int
+obj-m	Makefile	/^obj-m := gpio_wls.o $/;"	m
+usrdata	app/app_gpio.c	/^static char usrdata[] = {"usr data!"};$/;"	v	typeref:typename:char[]	file:
+wlsdev_exit	gpio_wls.c	/^static void __exit wlsdev_exit(void)$/;"	f	typeref:typename:void __exit	file:
+wlsdev_init	gpio_wls.c	/^static int __init wlsdev_init(void)$/;"	f	typeref:typename:int __init	file:

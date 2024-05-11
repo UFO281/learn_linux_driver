@@ -12,8 +12,8 @@
             "defines": [],
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x86",
-            "compilerPath": "/usr/bin/clang"
+            "intelliSenseMode": "linux-gcc-x86",
+            "compilerPath": "/usr/bin/gcc"
         }
     ],
     "version": 4

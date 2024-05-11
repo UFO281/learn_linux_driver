@@ -23,7 +23,7 @@
 
 
 /*--------------------------------------------------------------------*/
-#define Char_Dev_Base_Major     200             /* 主设备号*/
+#define LED_MAJOR     200             /* 主设备号*/
 #define Char_Dev_Base_Name      "linux_led"           /* 设备名*/
 
 #define LED_ON      1   
@@ -47,6 +47,7 @@
  */
 static void __iomem *IMX6U_CCM_CCGR1 = NULL;
 static void __iomem *SW_MUX_GPIO1_IO03 = NULL;
+static void __iomem *SW_PAD_GPIO1_IO03 = NULL;
 static void __iomem *GPIO01_DR = NULL;
 static void __iomem *GPIO01_GDIR = NULL;
 
@@ -59,8 +60,21 @@ static void __iomem *GPIO01_GDIR = NULL;
  */
 void led_switch(u8 sta)
 {
-    
 
+    u32 value =0;
+    if (sta == LED_ON)
+    {
+        value = readl(GPIO01_DR);
+        value &= ~(1<<3);
+        writel(value,GPIO01_DR);
+    }
+    else if ( sta == LED_OFF )
+    {
+        value = readl(GPIO01_DR);
+        value |= (1<<3);
+        writel(value,GPIO01_DR); 
+    }
+    
 }
 
 
@@ -126,32 +140,42 @@ static ssize_t led_read(    struct file *filp,
  * @brief 向设备写数据
  * 
  * @param filp 设备文件，表示打开的文件描述符
- * @param buf 设备写入数据
+ * @param buf 写入的数据
  * @param cnt 写入数据长度
  * @param offt 相对于文件的首地址偏移
  * @return 要写入的字节数，如果为负值，表示写入失败
  */
-static ssize_t led_write(  struct file *filp, 
-                                const char __user *buf, 
-                                size_t cnt, 
-                                loff_t *offt
-                            )
+static ssize_t led_write(   struct file *filp, 
+                            const char __user *buf, 
+                            size_t cnt, 
+                            loff_t *offt
+                        )
 {
     int ret = 0;
+    unsigned char databuf[1];
+    unsigned char ledstat;
 
-    /*向内核空间写数据*/
-    ret = copy_from_user(write_buf,buf,cnt);
-    if (ret ==0 )
+    /*向内核空间写数据 buf -> databuf */
+    ret = copy_from_user(databuf,buf,cnt);
+    if (ret<0 )
     {
-        printk("kernel RX data: %s\r\n",write_buf);
-    }
-    else
-    {
-        printk("kernel RX data failed!\r\n");
-
+        printk("kernel write data failed! \r\n");
+        return  -EFAULT;
     }
 
+    ledstat = databuf[0];   /*获取状态值*/
+
+    if (ledstat == LED_ON)
+    {
+        led_switch(LED_ON);
+    }
+    else if (ledstat == LED_OFF)
+    {
+        led_switch(LED_OFF);
+    }
+    
     return 0;     
+
 }
 
 
@@ -167,7 +191,7 @@ static ssize_t led_write(  struct file *filp,
 static int led_release(struct inode *inode, struct file *filp)
 {
 
-	printk("chrdevbase release! \r\n");
+	printk("led release! \r\n");
 
     return 0;
 
@@ -178,7 +202,7 @@ static int led_release(struct inode *inode, struct file *filp)
  * @brief 设备操作函数结构体
  * 
  */
-static struct file_operations chrdev_base_fops = {
+static struct file_operations led_fops = {
     
     .owner = THIS_MODULE,
     .open = led_open,
@@ -194,10 +218,24 @@ static struct file_operations chrdev_base_fops = {
  * 
  * @return int 
  */
-static int __init wlsdev_init(void)
+static int __init wlsled_init(void)
 {
 
     int ret = 0;
+    unsigned int value = 0;
+
+    /*初始化LED*/
+    /*1.虚拟地址映射，输入物理地址获得虚拟地址*/
+    IMX6U_CCM_CCGR1 = ioremap(CMM_CCGR1_BASE,4);
+    SW_MUX_GPIO1_IO03 = ioremap(SW_MUX_GPIO1_IO03_BASE,4);
+    SW_PAD_GPIO1_IO03 = ioremap(SW_PAD_GPIO1_IO03_BASE,4);
+    GPIO01_DR = ioremap(GPIO01_DR_BASE,4);
+    GPIO01_GDIR = ioremap(GPIO01_GDIR_BASE,4);
+
+    /*2. 使能GPIO1时钟*/
+    value = readl(IMX6U_CCM_CCGR1);
+
+
 
     /**
      * @brief 函数用于注册字符设备
@@ -208,7 +246,7 @@ static int __init wlsdev_init(void)
     * @param fops 结构体 file_operations 类型指针，指向设备的操作函数集合变量。
     * @return int 
     */
-    ret = register_chrdev(Char_Dev_Base_Major,"chartest",&chrdev_base_fops);
+    ret = register_chrdev(LED_MAJOR,"chartest",&led_fops);
     if ( ret<0 )
     {
         /*char device register failed!*/
@@ -216,7 +254,7 @@ static int __init wlsdev_init(void)
     }
     else
     {
-        printk("wlsdev_init() register succesfull!\r\n");
+        printk("wlsled_init() register succesfull!\r\n");
     }
        
 
@@ -239,7 +277,7 @@ static void __exit wlsdev_exit(void)
      * @param major 要注销的设备对应的主设备号
      * @param name 要注销的设备对应的设备名
      */
-    unregister_chrdev(Char_Dev_Base_Major,Char_Dev_Base_Name);
+    unregister_chrdev(LED_MAJOR,Char_Dev_Base_Name);
     printk("wlsdev_exit() unregister succesfull!\r\n");
 
 }
@@ -253,7 +291,7 @@ static void __exit wlsdev_exit(void)
         会调用这个接口
  * 
  */
-module_init(wlsdev_init);
+module_init(wlsled_init);
 
 
 /**
