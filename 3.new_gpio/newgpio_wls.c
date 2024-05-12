@@ -51,6 +51,55 @@ static void __iomem *GPIO01_DR = NULL;
 static void __iomem *GPIO01_GDIR = NULL;
 
 
+
+int major=0; /*主设备号*/
+int minor=0; /*次设备号*/
+
+dev_t devid=0;  /*设备号*/
+
+
+void malloc_linuxDEVID(void)
+{
+
+    if (major) /*申请了设备号*/
+    {
+        devid = MKDEV(major,0);/*将给定的主设备号和次设备号的值组合成 dev_t 类型的设备号*/
+        
+        /**
+         * @brief 注销字符设备之后要释放掉设备号,设备号释放函数
+         * 
+         * @param from 要释放的设备号
+         * @param count 表示从 from 开始，要释放的设备号数量。
+         */
+        register_chrdev_region(devid,1,"test");/*注册设备号*/
+    }
+    else
+    {
+
+        /**
+         * @brief 动态申请 linux 设备号
+         * 
+         * @param dev 保存申请到的设备号
+         * @param baseminor 次设备号起始地址，alloc_chrdev_region 可以申请一段连续的多个设备号，这
+                些设备号的主设备号一样，但是次设备号不同，次设备号以 baseminor 为起始地址地址开始递
+                增。一般 baseminor 为 0，也就是说次设备号从 0 开始。
+        * @param count 要申请的设备号数量。
+        * @param name 设备名字。
+        * @return int 
+        */
+        alloc_chrdev_region(&devid,0,1,"test");
+        major = MAJOR(devid);/*宏 MAJOR 用于从 dev_t 中获取主设备号，将 dev_t 右移 20 位即可*/
+        minor = MINOR(devid);/*宏 MINOR 用于从 dev_t 中获取次设备号，取 dev_t 的低 20 位的值即可*/
+
+    }
+    
+    // unregister_chrdev_region(devid, 1); /* 注销设备号 */
+
+
+}
+
+
+
 /**
  * @brief led open/off
  * 

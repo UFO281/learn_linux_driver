@@ -58,16 +58,16 @@ int main(int count,char **str)
     /*要执行的操作*/
     databuf[0]= atoi(str[2]);
 
-    // /*向/dev/led文件写入数据*/
-    // ret = write( fd,databuf,sizeof(databuf) );
-    // if (ret<0)
-    // {
-    //     printf("LED Control failed! \r\n");   
-    //     /*关闭设备*/
-    //     close(fd);
-    //     return -1;
+    /*向/dev/led文件写入数据*/
+    ret = write( fd,databuf,sizeof(databuf) );
+    if (ret<0)
+    {
+        printf("LED Control failed! \r\n");   
+        /*关闭设备*/
+        close(fd);
+        return -1;
     
-    // }
+    }
     
 
     // if ( atoi(str[2])==1 )

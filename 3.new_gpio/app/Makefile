@@ -5,20 +5,20 @@ CC=arm-linux-gnueabihf-gcc
 CFLAGS= -Wall -g -Wextra -std=c11
 
 # 定义最终可执行文件的名称
-TARGET = app_gpio
+TARGET = newapp_gpio
 
 # 默认目标 all，依赖于 $(TARGET) 即可执行文件
 all: $(TARGET)
 
 # 规则用于构建最终的目标文件 $(TARGET)，它依赖于对象文件 appwlsmain.o
 # 该规则会调用 $(CC) 执行链接
-$(TARGET): app_gpio.o
-	$(CC) $(CFLAGS) -o $(TARGET) app_gpio.o
+$(TARGET): newapp_gpio.o
+	$(CC) $(CFLAGS) -o $(TARGET) newapp_gpio.o
 
 # 规则告诉 make 如何生成 appwlsmain.o 从 appwlsmain.c 文件
 # 使用 $(CC) 和 $(CFLAGS) 编译源代码
-appwlsmain.o: appwlsmain.c
-	$(CC) $(CFLAGS) -c appwlsmain.c
+appwlsmain.o: newapp_gpio.c
+	$(CC) $(CFLAGS) -c newapp_gpio.c
 
 # clean 目标用于清除所有编译生成的文件，保持目录干净
 # 'rm -f' 用于删除文件，'-f' 标志忽略不存在的文件，避免错误提示
