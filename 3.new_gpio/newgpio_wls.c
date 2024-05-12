@@ -251,7 +251,6 @@ static struct file_operations led_fops = {
 static int __init wlsled_init(void)
 {
 
-    int ret = 0;
     unsigned int value = 0;
 
 	printk("wlsled_init start 1! \r\n");
@@ -398,9 +397,7 @@ static int __init wlsled_init(void)
 
 	printk("wlsled_init endoff 1! \r\n");
     
-
     return 0;
-
 	
 }
 
@@ -415,29 +412,23 @@ static int __init wlsled_init(void)
 static void __exit wlsdev_exit(void)
 {
 
-
-	/*取消虚拟映射*/
+	/*取消虚拟地址的映射*/
 	iounmap(IMX6U_CCM_CCGR1);
 	iounmap(SW_MUX_GPIO1_IO03);
 	iounmap(SW_PAD_GPIO1_IO03);
 	iounmap(GPIO01_DR);
 	iounmap(GPIO01_GDIR);
 
-    /**
-     * @brief 函数用户注销字符设备
-     * 
-     * @param major 要注销的设备对应的主设备号
-     * @param name 要注销的设备对应的设备名
-     */
-    unregister_chrdev(LED_MAJOR,Char_Dev_Base_Name);
+    /*注销字符设备*/
+    cdev_del(&led0.char_dev);/*删除char dev设备*/
+
+    unregister_chrdev_region(led0.devid,NEW_CHR_CNT); /*注销设备号*/
 
     /*删除设备*/
-    device_destroy();
-
+    device_destroy(led0.class,led0.devid);
+    
     /*删除类*/
-    class_destroy();
-
-    cdev_del(&gpio_cdev);
+    class_destroy(led0.class);
 
     printk("wlsdev_exit()6 unregister succesfull!\r\n");
 
@@ -472,27 +463,5 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("wls");
 
 
-/**
- * @brief 动态申请 linux 设备号
- * 
- * @param dev 保存申请到的设备号
- * @param baseminor 次设备号起始地址，alloc_chrdev_region 可以申请一段连续的多个设备号，这
-                    些设备号的主设备号一样，但是次设备号不同，次设备号以 baseminor 为起始地址地址开始递
-                    增。一般 baseminor 为 0，也就是说次设备号从 0 开始。
- * @param count 要申请的设备号数量。
- * @param name 设备名字。
- * @return int 
- */
-// int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count, const char *name);
-
-
-
-/**
- * @brief 注销字符设备之后要释放掉设备号,设备号释放函数
- * 
- * @param from 要释放的设备号
- * @param count 表示从 from 开始，要释放的设备号数量。
- */
-// void unregister_chrdev_region(dev_t from, unsigned count);
 
 
