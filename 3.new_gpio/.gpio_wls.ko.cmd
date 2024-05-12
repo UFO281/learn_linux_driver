@@ -1,0 +1,1 @@
+cmd_/home/wls/linux/Driver/2.gpio_driver/gpio_wls.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/wls/linux/Driver/2.gpio_driver/gpio_wls.ko /home/wls/linux/Driver/2.gpio_driver/gpio_wls.o /home/wls/linux/Driver/2.gpio_driver/gpio_wls.mod.o
