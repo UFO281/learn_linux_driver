@@ -28,6 +28,7 @@
  */
 int main(int count,char **str)
 {
+    printf("hh\n");
     int fd,ret;
     char *file_name=NULL;
     unsigned char databuf[1];

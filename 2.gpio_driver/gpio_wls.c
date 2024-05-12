@@ -61,7 +61,6 @@ static void __iomem *GPIO01_GDIR = NULL;
 void led_switch(u8 sta)
 {
 
-	printk("led_switch  5! \r\n");
 
     u32 value =0;
     if (sta == LED_ON)
@@ -77,6 +76,7 @@ void led_switch(u8 sta)
         writel(value,GPIO01_DR); 
     }
     
+	printk("led_switch  5! \r\n");
 }
 
 
@@ -159,11 +159,13 @@ static ssize_t led_write(   struct file *filp,
                             loff_t *offt
                         )
 {
-	printk("led_write start 4! \r\n");
 
     int ret = 0;
     unsigned char databuf[1];
     unsigned char ledstat;
+
+	printk("led_write start 4! \r\n");
+
 
     /*向内核空间写数据 buf -> databuf */
     ret = copy_from_user(databuf,buf,cnt);
@@ -238,11 +240,10 @@ static struct file_operations led_fops = {
 static int __init wlsled_init(void)
 {
 
-	printk("wlsled_init start 1! \r\n");
-
-
     int ret = 0;
     unsigned int value = 0;
+
+	printk("wlsled_init start 1! \r\n");
 
     /*初始化LED*/
     /*1.虚拟地址映射，输入物理地址获得虚拟地址*/
@@ -322,8 +323,6 @@ static int __init wlsled_init(void)
 static void __exit wlsdev_exit(void)
 {
 
-    printk("wlsdev_exit  6! \r\n");
-
 
 	/*取消虚拟映射*/
 	iounmap(IMX6U_CCM_CCGR1);
@@ -332,7 +331,6 @@ static void __exit wlsdev_exit(void)
 	iounmap(GPIO01_DR);
 	iounmap(GPIO01_GDIR);
 
-
     /**
      * @brief 函数用户注销字符设备
      * 
@@ -340,7 +338,7 @@ static void __exit wlsdev_exit(void)
      * @param name 要注销的设备对应的设备名
      */
     unregister_chrdev(LED_MAJOR,Char_Dev_Base_Name);
-    printk("wlsdev_exit() unregister succesfull!\r\n");
+    printk("wlsdev_exit()6 unregister succesfull!\r\n");
 
 }
 
