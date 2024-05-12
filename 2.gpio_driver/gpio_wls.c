@@ -83,7 +83,7 @@ void led_switch(u8 sta)
 
 
 /**
- * @brief 打开led设备
+ * @brief 打开led设备，main函数里调用open函数的时候就会调用这个函数
  * 
  * @param inode 传递驱动的inode
  * @param filp  设备文件，file 结构体有个叫做 private_data 的成员变量
@@ -199,7 +199,7 @@ static ssize_t led_write(   struct file *filp,
 
 
 /**
- * @brief 关闭/释放设备
+ * @brief 关闭/释放设备，main函数的调用close函数时候就会调用这个函数
  * 
  * @param inode 
  * @param filp 文件描述符
@@ -231,7 +231,8 @@ static struct file_operations led_fops = {
 
 
 /**
- * @brief 驱动入口函数
+ * @brief 驱动入口函数  
+ *      执行这个指令 加载驱动模块时候 modprobe gpio_wls.ko，调用这个函数
  *      
  *      配置GPIO属性；eg: 开启GPIO外设时钟，输入/输出模式，上下拉，速度等等
  * 
@@ -317,6 +318,7 @@ static int __init wlsled_init(void)
 
 /**
  * @brief 模块驱动出口函数
+ *        rmmod gpio_wls.ko，执行这个指令卸载驱动模块的时候调用这个函数     
  * 
  * @return int 
  */

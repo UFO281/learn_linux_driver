@@ -28,7 +28,7 @@
  */
 int main(int count,char **str)
 {
-    printf("hh\n");
+    printf("\r\nhh\r\n");
     int fd,ret;
     char *file_name=NULL;
     unsigned char databuf[1];
@@ -45,23 +45,29 @@ int main(int count,char **str)
     fd = open(file_name,O_RDWR);
     if (fd<0 )
     {
-        printf("can't open file %s\r\n",file_name);
+        printf("\r\ncan't open file %s\r\n",file_name);
         return -1;
     }
+    else
+    {
+        printf("\r\nopen file OK! %s\r\n",file_name);
+        
+    }
+    
 
     /*要执行的操作*/
     databuf[0]= atoi(str[2]);
 
-    /*向/dev/led文件写入数据*/
-    ret = write( fd,databuf,sizeof(databuf) );
-    if (ret<0)
-    {
-        printf("LED Control failed! \r\n");   
-        /*关闭设备*/
-        close(fd);
-        return -1;
+    // /*向/dev/led文件写入数据*/
+    // ret = write( fd,databuf,sizeof(databuf) );
+    // if (ret<0)
+    // {
+    //     printf("LED Control failed! \r\n");   
+    //     /*关闭设备*/
+    //     close(fd);
+    //     return -1;
     
-    }
+    // }
     
 
     // if ( atoi(str[2])==1 )
@@ -96,9 +102,13 @@ int main(int count,char **str)
     if (ret<0)
     {
 
-        printf("Can't close file %s \r\n",file_name);   
+        printf("\r\nCan't close file %s \r\n",file_name);   
 
         return -1;
+    }
+    else{
+        printf("\r\nclose file ok! %s \r\n",file_name);   
+
     }
     
 
