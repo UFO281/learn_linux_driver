@@ -1,6 +1,12 @@
-# <center> Linux Driver Example
-    this is linux drver learn example 
-    SOC_dev base nxp imx.6ull
+# <center> 第四十二章 新字符设备驱动实验
+>经过前两章实验的实战操作，我们已经掌握了 Linux 字符设备驱动开发的基本步骤，字符
+设备驱动开发重点是使用 register_chrdev 函数注册字符设备，当不再使用设备的时候就使用
+unregister_chrdev 函数注销字符设备，驱动模块加载成功以后还需要手动使用 mknod 命令创建
+设备节点。register_chrdev 和 unregister_chrdev 这两个函数是老版本驱动使用的函数，现在新的字符设备驱动已经不再使用这两个函数，而是使用 Linux 内核推荐的新字符设备驱动 API 函数。
+
+**本节我们就来学习一下如何编写新字符设备驱动，并且在驱动模块加载的时候自动创建设备节
+点文件。**
+
     
 # chatper 1
 

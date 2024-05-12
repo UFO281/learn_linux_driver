@@ -1,10 +1,9 @@
 /**
- * @file wlsmain.c
+ * @file newgpio_wls.c
  * @author wls (ufo281@outlook.com) 
- * @brief 这个是linux的驱动文件,makefile 只编译此文件,
- *        GPIO驱动led
+ * @brief 使用新的linux驱动API，并且具有自动创建驱动设备节点文件的功能
  * @version 1.0
- * @date 2024-05-10
+ * @date 2024-05-12
  * 
  * @copyright Copyright (c) 2024
  * 
