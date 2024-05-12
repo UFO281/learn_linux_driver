@@ -16,6 +16,7 @@
 #include <linux/module.h>
 #include <linux/errno.h>
 #include <linux/gpio.h>
+#include <linux/cdev.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
@@ -264,6 +265,12 @@ static int led_release(struct inode *inode, struct file *filp)
 
 
 /**
+ * @brief 新字符设备结构体
+ * 
+ */
+struct cdev gpio_cdev;
+
+/**
  * @brief 设备操作函数结构体
  * 
  */
@@ -332,7 +339,8 @@ static int __init wlsled_init(void)
 	value |= (1<<3);
 	writel(value,GPIO01_DR);
 
-	
+#if 0
+/*-----------Old--register---linux dev----------------------*/
     /**
      * @brief 函数用于注册字符设备
      * 
@@ -353,7 +361,40 @@ static int __init wlsled_init(void)
     {
         printk("wlsled_init() register succesfull!\r\n");
     }
-       
+/*-----------Old--register---linux dev----------------------*/
+#endif       
+
+
+
+#if 1
+/*-----------new--register---linux dev----------------------*/
+    
+    
+    
+    /**
+     * @brief 函数用于注册字符设备
+     * 
+     * @param major 主设备号，Linux 下每个设备都有一个设备号，设备号分为主设备号和次设备号两
+            部分，关于设备号后面会详细讲解。
+    * @param name 设备名字，指向一串字符串。
+    * @param fops 结构体 file_operations 类型指针，指向设备的操作函数集合变量。
+    * @return int 
+    */
+    ret = register_chrdev(LED_MAJOR,Char_Dev_Base_Name,&led_fops);
+    if ( ret<0 )
+    {
+        /*char device register failed!*/
+        printk("led register failed!\r\n");
+		return -EIO;
+    }
+    else
+    {
+        printk("wlsled_init() register succesfull!\r\n");
+    }
+/*-----------new--register---linux dev----------------------*/
+#endif    
+
+
 	printk("wlsled_init endoff 1! \r\n");
     
 
