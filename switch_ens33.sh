@@ -1,17 +1,20 @@
 #!/bin/bash
 
+# 定义你的sudo密码
+PASSWORD="123123"
+
 # 检查输入参数是否为1或0
 if [ $# -eq 1 ]; then
     
     # 如果参数为1，执行命令：sudo ifconfig ens33 up
     if [ "$1" -eq 1 ]; then
-        sudo ifconfig ens33 up
+        echo $PASSWORD | sudo -S ifconfig ens33 up
         echo "Interface ens33 is up."
         ifconfig
 
     # 如果参数为0，执行命令：sudo ifconfig ens33 down
     elif [ "$1" -eq 0 ]; then
-        sudo ifconfig ens33 down
+        echo $PASSWORD | sudo -S ifconfig ens33 down
         echo "Interface ens33 is down."
         ifconfig
 
