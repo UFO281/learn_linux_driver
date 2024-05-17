@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectSettings
+	AppVer="4.00.0137"
+	AppVerMinReader="4.00.0034"
+	GlobalConfiguration="1"
+	GlobalWorkspace="0"
+	LocalsInDb="0"
+	IndexMembers="1"
+	IndexFragments="1"
+	UseMasterFileList="0"
+	SourceDir="..\..\"
+	BackupDir="%PROJECT_DATA_DIR%\Backup"
+	MasterFileList="%PROJECT_SOURCE_DIR%\%PROJECT_NAME%_filelist.txt"
+	IsImportProject="0"
+	>
+	<Imports>
+		<ImportedLibs>
+			<item
+				LibraryFile="C:\Users\ufo28\Desktop\em_linux\linux-imx-rel_imx_4.1.15_2.1.0_ga"
+				LibraryProject="C:\Users\ufo28\Documents\Source Insight 4.0\Projects\_import_C__Users_ufo28_Desktop_em_linux_linux-imx-rel_imx_4.1.15_2.1.0_ga\_import_C__Users_ufo28_Desktop_em_linux_linux-imx-rel_imx_4.1.15_2.1.0_ga"
+				/>
+		</ImportedLibs>
+	</Imports>
+	<ParseConditions>
+		<Defines/>
+	</ParseConditions>
+</ProjectSettings>
