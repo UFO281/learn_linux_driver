@@ -5,7 +5,7 @@ CC=arm-linux-gnueabihf-gcc
 CFLAGS= -Wall -g -Wextra -std=c11
 
 # 定义最终可执行文件的名称
-TARGET = treeapp_gpio
+TARGET = app_pnctrl_gpioled
 
 # 默认目标 all，依赖于 $(TARGET) 即可执行文件
 all: $(TARGET)

@@ -4,7 +4,7 @@ KERNELDIR := /home/wls/linux/os_src/linux-imx-rel_imx_4.1.15_2.1.0_ga
 CURRENT_PATH := $(shell pwd)
 
 # 设置目标文件名
-obj-m := treegpio_wls.o
+obj-m := pnctrl_gpioled.o
 
 # build目标
 build: driver_modules app_modules

@@ -20,6 +20,7 @@
 #include <linux/device.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
+#include <linux/of_gpio.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
@@ -27,7 +28,7 @@
 
 /*--------------------------------------------------------------------*/
 #define NEW_CHR_CNT     1   /*设备个数*/
-#define NEW_CHR_Name    "linuxtree_led" /* 设备名*/
+#define NEW_CHR_Name    "pinctrl_gpio_led" /* 设备名*/
 
 #define LED_ON      1   
 #define LED_OFF     0   
@@ -48,11 +49,11 @@
  * @brief linux OS 映射后的寄存器虚拟地址
  * 
  */
-static void __iomem *IMX6U_CCM_CCGR1 = NULL;
-static void __iomem *SW_MUX_GPIO1_IO03 = NULL;
-static void __iomem *SW_PAD_GPIO1_IO03 = NULL;
-static void __iomem *GPIO01_DR = NULL;
-static void __iomem *GPIO01_GDIR = NULL;
+// static void __iomem *IMX6U_CCM_CCGR1 = NULL;
+// static void __iomem *SW_MUX_GPIO1_IO03 = NULL;
+// static void __iomem *SW_PAD_GPIO1_IO03 = NULL;
+// static void __iomem *GPIO01_DR = NULL;
+// static void __iomem *GPIO01_GDIR = NULL;
 
 
 
@@ -69,41 +70,11 @@ typedef struct LEDDEV
     int major;  /*主设备号*/
     int minor;  /*次设备号*/
     struct device_node *nd; /*设备节点*/
+    int led_gpio;   /*led 所使用的GPIO编号*/
 
 }led_dev;
 
 led_dev led0;
-
-
-
-
-
-/**
- * @brief led open/off
- * 
- * @param sta   LED_ON:  OPEN LED
- *              LED_OFF: OFF LED
- */
-void led_switch(u8 sta)
-{
-
-
-    u32 value =0;
-    if (sta == LED_ON)
-    {
-        value = readl(GPIO01_DR);
-        value &= ~(1<<3);
-        writel(value,GPIO01_DR);
-    }
-    else if ( sta == LED_OFF )
-    {
-        value = readl(GPIO01_DR);
-        value |= (1<<3);
-        writel(value,GPIO01_DR); 
-    }
-    
-	printk("led_switch  5! \r\n");
-}
 
 
 
@@ -173,6 +144,7 @@ static ssize_t led_write(   struct file *filp,
     int ret = 0;
     unsigned char databuf[1];
     unsigned char ledstat;
+    led_dev *dev = filp->private_data;
 
 	printk("led_write start 4! \r\n");
 
@@ -189,13 +161,17 @@ static ssize_t led_write(   struct file *filp,
 
     if (ledstat == LED_ON)
     {
-        led_switch(LED_ON);
+        // led_switch(LED_ON);
+        gpio_set_value(dev->led_gpio,0);  /*打开LED灯*/
         printk("len on! \r\n");
 
     }
     else if (ledstat == LED_OFF)
     {
-        led_switch(LED_OFF);
+        gpio_set_value(dev->led_gpio,1); /*关闭LED灯*/
+        // led_switch(LED_OFF);
+        printk("len off! \r\n");
+
     }
     
 
@@ -254,162 +230,48 @@ static struct file_operations led_fops = {
 static int __init wlsled_init(void)
 {
 
-    unsigned int value = 0;
+    // unsigned int value = 0;
     int ret = 0;
-    unsigned int regdata[14];
-    const char *status_value;
-    struct property *proper;
-    u8 i = 0;
+    // unsigned int regdata[14];
+    // const char *status_value;
+    // struct property *proper;
+    // u8 i = 0;
 
 	printk("wlsled_init start 1! \r\n");
 
-    /*获取设备树的配置属性值*/
-    /*1. 获取设备节点*/
-    led0.nd = of_find_node_by_path("/wls_led");
+    /*1. 获取led所使用的GPIO*/
+    led0.nd = of_find_node_by_path("/wgpioled");
     if (led0.nd==NULL)
     {
-        printk("wls_led node Not found!\n");
+        printk("wls_led node Not found!\r\n");
         return -ENAVAIL;
     }
     else
     {
-        printk("wls_led node found!\n");
+        printk("wls_led node found!\r\n");
         
     }
     
-    /*2. 获取compatibale 属性的值*/
-            /*of_find_property 查找指定属性函数*/
-    proper = of_find_property(led0.nd,"compatible",NULL);
-    if (proper==NULL)
+    /*2. 获取设备树中的GPIO属性，得到LED所使用的LED编号*/
+    led0.led_gpio = of_get_named_gpio(led0.nd,"led-gpio",0);
+    if (led0.led_gpio<0)
     {
-        printk("compatible property  Not found!\n");
-        // return -ENAVAIL;
+        printk("can't get led-gpio!\n");
+        return -ENAVAIL;
     }
     else
     {
-        printk("compatible property found it!\n");  
-        
+        printk("led-gpio num = %d!\n",led0.led_gpio);     
     }
 
-    /*3. 获取status属性的值*/        
-    ret = of_property_read_string(led0.nd,"status",&status_value);
+    /*3.设置GPIO1_IO03为输出，并且输出高低电平，默认关闭LED灯*/        
+    ret = gpio_direction_output(led0.led_gpio,1);
     if (ret<0)
     {
-        printk("status read failed!\r\n");
-        // return -ENAVAIL;
-    }
-    else
-    {
-        printk("status value = %s \r\n",status_value);
-            
-    }
-
-    /*4. 获取reg属性的值*/
-    /*of_property_read_u32_array 一次性获取所有的reg值 10为数组元素数量 */
-    ret = of_property_read_u32_array(led0.nd,"reg",regdata,10);
-    if (ret<0)
-    {
-        printk("reg property read failed!\r\n");
-        // return -ENAVAIL;
-    }
-    else
-    {
-        printk("reg vlue:\r\n");
-        for (i = 0; i < 10; i++)
-        {
-            printk("%#X ",regdata[i]);
-
-        }
-        printk("\r\n");
-          
+        printk("can't set gpio!!\r\n");
     }
 
 
-#if 0
-
-    /*初始化LED*/
-    /*1.虚拟地址映射，输入物理地址获得虚拟地址*/
-    IMX6U_CCM_CCGR1 = ioremap(CMM_CCGR1_BASE,4);
-    SW_MUX_GPIO1_IO03 = ioremap(SW_MUX_GPIO1_IO03_BASE,4);
-    SW_PAD_GPIO1_IO03 = ioremap(SW_PAD_GPIO1_IO03_BASE,4);
-    GPIO01_DR = ioremap(GPIO01_DR_BASE,4);
-    GPIO01_GDIR = ioremap(GPIO01_GDIR_BASE,4);
-
-#else
-
-    /*初始化LED*/
-    /*1.虚拟地址映射，输入物理地址获得虚拟地址*/
-    /**
-     * @brief 使用 of_iomap 函数一次性完成读取 reg 属性以及内存映射，
-     * of_iomap 函数是设备树推荐使用的 OF 函数
-     * 
-     */
-    IMX6U_CCM_CCGR1 = of_iomap(led0.nd,0);
-    SW_MUX_GPIO1_IO03 = of_iomap(led0.nd,1);
-    SW_PAD_GPIO1_IO03 = of_iomap(led0.nd,2);
-    GPIO01_DR = of_iomap(led0.nd,3);
-    GPIO01_GDIR = of_iomap(led0.nd,4);
-
-#endif
-
-    /*2. 使能GPIO1时钟*/
-    value = readl(IMX6U_CCM_CCGR1);
-    value &= ~(3<<26); /* clear before setting*/
-	value |= (3<<26); /*set new value */
-	writel(value,IMX6U_CCM_CCGR1);
-
-
-	/*3. 设置GPIO01_IO03的复用功能
-		复用为GPIO1_IO03，最后设置IO属性
-	*/	
-	writel(5,SW_MUX_GPIO1_IO03);
-	
-
-	/*寄存器SW_PAD_GPIO1_IO03 设置IO属性
-    上下拉，输出速度等等*/
-	writel(0x10B0,SW_PAD_GPIO1_IO03);	
-
-
-	/*4. 设置GPIO1_IO03为输出功能*/
-	value = readl(GPIO01_GDIR);
-	value &= ~(1<<3);/*清楚以前的设置*/
-	value |= (1<<3); /*设置为输出*/
-	writel(value,GPIO01_GDIR);
-    
-
-	/*5. 默认关闭LED 输出高电平*/
-	value = readl(GPIO01_DR);
-	value |= (1<<3);
-	writel(value,GPIO01_DR);
-
-#if 0
-/*-----------Old--register---linux dev----------------------*/
-    /**
-     * @brief 函数用于注册字符设备
-     * 
-     * @param major 主设备号，Linux 下每个设备都有一个设备号，设备号分为主设备号和次设备号两
-            部分，关于设备号后面会详细讲解。
-    * @param name 设备名字，指向一串字符串。
-    * @param fops 结构体 file_operations 类型指针，指向设备的操作函数集合变量。
-    * @return int 
-    */
-    ret = register_chrdev(LED_MAJOR,Char_Dev_Base_Name,&led_fops);
-    if ( ret<0 )
-    {
-        /*char device register failed!*/
-        printk("led register failed!\r\n");
-		return -EIO;
-    }
-    else
-    {
-        printk("wlsled_init() register succesfull!\r\n");
-    }
-/*-----------Old--register---linux dev----------------------*/
-
-#else
-
-/*-----------new--register---linux dev----------------------*/
-    
     /*注册字符设备驱动*/
     /*1. 创建设备号*/
     if (led0.major) /*申请了设备号*/
@@ -449,7 +311,7 @@ static int __init wlsled_init(void)
 
     }
     
-    printk("DEV_ID Register OK! led0.major:%d minor:%d !\r\n",
+    printk("\nDEV_ID Register OK! led0.major:%d minor:%d !\r\n",
             led0.major,led0.minor);
 
     /*2. 初始化 char_dev*/
@@ -478,12 +340,6 @@ static int __init wlsled_init(void)
         return PTR_ERR(led0.devices);
     }
 
-/*-----------new--register---linux dev----------------------*/
-#endif    
-
-
-	printk("wlsled_init endoff 1! \r\n");
-    
     return 0;
 	
 }
@@ -498,13 +354,6 @@ static int __init wlsled_init(void)
  */
 static void __exit wlsdev_exit(void)
 {
-
-	/*取消虚拟地址的映射*/
-	iounmap(IMX6U_CCM_CCGR1);
-	iounmap(SW_MUX_GPIO1_IO03);
-	iounmap(SW_PAD_GPIO1_IO03);
-	iounmap(GPIO01_DR);
-	iounmap(GPIO01_GDIR);
 
     /*注销字符设备*/
     cdev_del(&led0.char_dev);/*删除char dev设备*/
