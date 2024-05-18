@@ -1,1 +1,0 @@
-cmd_/home/wls/linux/Driver/11.key/11key.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/wls/linux/Driver/11.key/11key.ko /home/wls/linux/Driver/11.key/11key.o /home/wls/linux/Driver/11.key/11key.mod.o
