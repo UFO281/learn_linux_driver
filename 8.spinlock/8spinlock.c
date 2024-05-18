@@ -1,7 +1,7 @@
 /**
  * @file 7.c
  * @author wls (ufo281@outlook.com) 
- * @brief 原子操作,一次执行到底，不受打扰
+ * @brief 自旋锁
 
  * @version 1.0
  * @date 2024-05-17
@@ -52,6 +52,8 @@ typedef struct linuxDEV
     struct device_node *nd; /*设备节点*/
     int led_gpio;   /*led 所使用的GPIO编号*/
     atomic_t atlock; /*原子锁*/
+    int dev_stats; /*设备状态，0，设备未使用：>0，设备已经被使用*/
+    spinlock_t spinlock; /*自旋锁*/
 
 }gpio_dev;
 
@@ -70,16 +72,21 @@ gpio_dev led;
  */
 static int devopen(struct inode *inode, struct file *filp)
 {
+    unsigned long flags;
     printk("Driver: devopen 2! \r\n");
-    
-    /*从 led.atlock 减 1，如果结果为 0 就返回真，否则返回假*/
-    if (!atomic_dec_and_test(&led.atlock))
+    filp->private_data = &led; /*设置私有数据*/
+
+    /*自旋锁上锁*/
+    spin_lock_irqsave(&led.spinlock,flags);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
+
+    if (led.dev_stats) /*如果设备被使用了*/
     {
-        atomic_inc(&led.atlock);
-        return -EBUSY;  /* led被使用，返回忙*/
+        spin_unlock_irqrestore(&led.spinlock,flags);/*开启并恢复中断状态，解锁*/
+        return -EBUSY;   
     }
     
-    filp->private_data = &led; /*设置私有数据*/
+    led.dev_stats++;    /*如果装备 没打开，就标记打开了*/
+    spin_unlock_irqrestore(&led.spinlock,flags);/*开启并恢复中断状态，解锁*/
 	
     return 0;
 	
@@ -179,13 +186,24 @@ static ssize_t devwrite(   struct file *filp,
  */
 static int devrelease(struct inode *inode, struct file *filp)
 {
+    unsigned long flags;
 
     gpio_dev *dev = filp->private_data;
 
 	printk("Driver: devrelease! 7 \r\n");
 
-    /*关闭驱动文件的时候释放原子变量*/
-    atomic_inc(&dev->atlock);
+    /*关闭驱动文件的时候将dev_stats减少1*/
+    /*自旋锁上锁*/
+    spin_lock_irqsave(&dev->spinlock,flags);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
+
+    if (dev->dev_stats)
+    {
+        dev->dev_stats--;
+
+    }
+
+    /*解锁*/
+    spin_unlock_irqrestore(&dev->spinlock,flags);    
 
     return 0;
 
@@ -234,9 +252,8 @@ static int __init wlsdevinit(void)
 
 	printk("Driver: wlsdevinit 1! \r\n");
 
-
-    /*初始化原子变量*/
-    atomic_set(&led.atlock,1);/* 原子变量初始值为 1 */
+    /*初始化自旋锁*/
+    spin_lock_init(&led.spinlock);
 
     /*1. 获取led所使用的GPIO*/
     led.nd = of_find_node_by_path("/wgpioled");
