@@ -72,21 +72,22 @@ gpio_dev led;
  */
 static int devopen(struct inode *inode, struct file *filp)
 {
-    unsigned long flags;
+    unsigned long int_status;/*中断状态值*/
     printk("Driver: devopen 2! \r\n");
     filp->private_data = &led; /*设置私有数据*/
 
     /*自旋锁上锁*/
-    spin_lock_irqsave(&led.spinlock,flags);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
+    spin_lock_irqsave(&led.spinlock,int_status);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
 
+    /*本次自旋锁保护的是led.dev_stats变量*/
     if (led.dev_stats) /*如果设备被使用了*/
     {
-        spin_unlock_irqrestore(&led.spinlock,flags);/*开启并恢复中断状态，解锁*/
+        spin_unlock_irqrestore(&led.spinlock,int_status);/*开启并恢复中断状态，解锁*/
         return -EBUSY;   
     }
     
     led.dev_stats++;    /*如果装备 没打开，就标记打开了*/
-    spin_unlock_irqrestore(&led.spinlock,flags);/*开启并恢复中断状态，解锁*/
+    spin_unlock_irqrestore(&led.spinlock,int_status);/*开启并恢复中断状态，解锁*/
 	
     return 0;
 	
@@ -186,7 +187,7 @@ static ssize_t devwrite(   struct file *filp,
  */
 static int devrelease(struct inode *inode, struct file *filp)
 {
-    unsigned long flags;
+    unsigned long int_status;
 
     gpio_dev *dev = filp->private_data;
 
@@ -194,16 +195,16 @@ static int devrelease(struct inode *inode, struct file *filp)
 
     /*关闭驱动文件的时候将dev_stats减少1*/
     /*自旋锁上锁*/
-    spin_lock_irqsave(&dev->spinlock,flags);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
+    spin_lock_irqsave(&dev->spinlock,int_status);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
 
+    /*本次自旋锁保护的是led.dev_stats变量*/
     if (dev->dev_stats)
     {
         dev->dev_stats--;
 
     }
-
     /*解锁*/
-    spin_unlock_irqrestore(&dev->spinlock,flags);    
+    spin_unlock_irqrestore(&dev->spinlock,int_status);    
 
     return 0;
 
