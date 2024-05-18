@@ -2,6 +2,18 @@
  * @file 7.c
  * @author wls (ufo281@outlook.com) 
  * @brief 自旋锁
+ * 
+ * 1.中断中使用
+    void spin_lock_irq(spinlock_t *lock) 禁止本地中断，并获取自旋锁。
+    void spin_unlock_irq(spinlock_t *lock) 激活本地中断，并释放自旋锁。
+   
+   2.线程中使用
+    void spin_lock_irqsave(spinlock_t *lock,unsigned long flags) 保存中断状态，禁止本地中断，并获取自旋锁。
+    void spin_unlock_irqrestore(spinlock_t*lock, unsigned long flags)
+    将中断状态恢复到以前的状态，并且激活本地中断，
+    释放自旋锁。
+
+
 
  * @version 1.0
  * @date 2024-05-17
@@ -76,7 +88,7 @@ static int devopen(struct inode *inode, struct file *filp)
     printk("Driver: devopen 2! \r\n");
     filp->private_data = &led; /*设置私有数据*/
 
-    /*自旋锁上锁*/
+    /*自旋锁上锁*/  
     spin_lock_irqsave(&led.spinlock,int_status);/*保存中断状态，禁止中断，获取自旋锁，简称上锁*/    
 
     /*本次自旋锁保护的是led.dev_stats变量*/
