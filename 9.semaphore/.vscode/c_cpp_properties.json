@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/wls/linux/os_src/linux-imx-rel_imx_4.1.15_2.1.0_ga/include",
+                "/home/wls/linux/os_src/linux-imx-rel_imx_4.1.15_2.1.0_ga/arch/arm/include",
+                "/home/wls/linux/os_src/linux-imx-rel_imx_4.1.15_2.1.0_ga/arch/arm/include/generated",
+                "/usr/include"
+            ],
+            "defines": [],
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-x86",
+            "configurationProvider": "ms-vscode.makefile-tools",
+            "compilerPath": "/usr/bin/clang"
+        }
+    ],
+    "version": 4
+}
