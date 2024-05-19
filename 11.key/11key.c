@@ -61,11 +61,11 @@
 
 
 /*--------------------------------------------------------------------*/
-#define LED_CNT     1           /*设备个数*/
-#define LED_Name    "mutex-led0" /* 设备名*/
+// #define LED_CNT     1           /*设备个数*/
+// #define LED_Name    "mutex-led0" /* 设备名*/
 
-#define LED_ON      1   
-#define LED_OFF     0   
+// #define LED_ON      1   
+// #define LED_OFF     0   
 
 #define KEY_CNT     1           /*设备个数*/
 #define KEY_Name    "wkey" /* 设备名*/
@@ -195,15 +195,17 @@ static ssize_t devread(    struct file *filp,
 
     if (gpio_get_value(dev->gpio_number)==0)
     {
-        while ( !gpio_get_value(dev->gpio_number) ==0 ) /*等待按键释放*/
+        while ( !gpio_get_value(dev->gpio_number)) /*等待按键释放*/
         {
             atomic_set(&dev->key_va,KEY_VALUE);
+            printk("Driver: key0 yes!\r\n");
         }
-        
     }
     else
     {
         atomic_set(&dev->key_va,INvakey);
+        printk("Driver: key0 NO!\r\n");
+
     }
     value = atomic_read(&dev->key_va);
     ret = copy_to_user(buf,&value,sizeof(value));/* value -> buf*/
@@ -302,7 +304,7 @@ static struct file_operations devfops = {
     .owner = THIS_MODULE,
     .open = devopen,
     .read = devread,
-    .write = devwrite,
+    // .write = devwrite,
     .release = devrelease
 
 };
