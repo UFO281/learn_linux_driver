@@ -80,7 +80,7 @@ int main(int count,char **str)
         read(fd,&keyvalue,sizeof(keyvalue));
         if ( keyvalue == KEY_VALUE )
         {
-            printf("KEY0 Press, value = %#X\r\n",keyvalue);/*按下*/
+            printf("APP: KEY0 Press, value = %#X\r\n",keyvalue);/*按下*/
         }
 
     }

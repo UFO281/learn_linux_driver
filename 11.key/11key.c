@@ -191,20 +191,20 @@ static ssize_t devread(    struct file *filp,
     unsigned char value;
     gpio_dev *dev = filp->private_data;
 	
-    printk("Driver: devread 3!\r\n");
+    // printk("Driver: devread 3!\r\n");
 
     if (gpio_get_value(dev->gpio_number)==0)
     {
         while ( !gpio_get_value(dev->gpio_number)) /*等待按键释放*/
         {
             atomic_set(&dev->key_va,KEY_VALUE);
-            printk("Driver: key0 yes!\r\n");
+            // printk("Driver: key0 yes!\r\n");
         }
     }
     else
     {
         atomic_set(&dev->key_va,INvakey);
-        printk("Driver: key0 NO!\r\n");
+        // printk("Driver: key0 NO!\r\n");
 
     }
     value = atomic_read(&dev->key_va);
