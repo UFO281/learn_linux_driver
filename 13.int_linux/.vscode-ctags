@@ -30,7 +30,7 @@
 !_TAG_PARSER_VERSION!C	1.1	/current.age/
 !_TAG_PARSER_VERSION!Make	0.0	/current.age/
 !_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
-!_TAG_PROC_CWD	/home/wls/linux/Driver/12.linux_timer/	//
+!_TAG_PROC_CWD	/home/wls/linux/Driver/13.int_linux/	//
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
@@ -43,44 +43,56 @@
 !_TAG_ROLE_DESCRIPTION!Make!makefile	included	/included/
 !_TAG_ROLE_DESCRIPTION!Make!makefile	optional	/optionally included/
 $(TARGET)	app/Makefile	/^$(TARGET): $(TARGET).o$/;"	t
-BEPP_OFF	10mutex.c	/^#define BEPP_OFF /;"	d	file:
-BEPP_ON	10mutex.c	/^#define BEPP_ON /;"	d	file:
 CC	app/Makefile	/^CC=arm-linux-gnueabihf-gcc$/;"	m
 CFLAGS	app/Makefile	/^CFLAGS= -Wall -g -Wextra -std=c11$/;"	m
+CLOSE_CMD	app/appint.c	/^#define CLOSE_CMD /;"	d	file:
+CLOSE_CMD	int_linux.c	/^#define CLOSE_CMD /;"	d	file:
 CURRENT_PATH	Makefile	/^CURRENT_PATH := $(shell pwd)$/;"	m
 KERNELDIR	Makefile	/^KERNELDIR := \/home\/wls\/linux\/os_src\/linux-imx-rel_imx_4.1.15_2.1.0_ga$/;"	m
-NEW_CHR_CNT	10mutex.c	/^#define NEW_CHR_CNT /;"	d	file:
-NEW_CHR_Name	10mutex.c	/^#define NEW_CHR_Name /;"	d	file:
-TARGET	app/Makefile	/^TARGET = app10mutex$/;"	m
+LED_OFF	int_linux.c	/^#define LED_OFF /;"	d	file:
+LED_ON	int_linux.c	/^#define LED_ON /;"	d	file:
+NEW_CHR_CNT	int_linux.c	/^#define NEW_CHR_CNT /;"	d	file:
+NEW_CHR_Name	int_linux.c	/^#define NEW_CHR_Name /;"	d	file:
+OPEN_CMD	app/appint.c	/^#define OPEN_CMD /;"	d	file:
+OPEN_CMD	int_linux.c	/^#define OPEN_CMD /;"	d	file:
+SETPERIOD_CMD	app/appint.c	/^#define SETPERIOD_CMD /;"	d	file:
+SETPERIOD_CMD	int_linux.c	/^#define SETPERIOD_CMD /;"	d	file:
+TARGET	app/Makefile	/^TARGET = appint$/;"	m
+TIMER_CNT	int_linux.c	/^#define TIMER_CNT /;"	d	file:
+TIMER_NAME	int_linux.c	/^#define TIMER_NAME /;"	d	file:
 all	app/Makefile	/^all: $(TARGET)$/;"	t
 app_modules	Makefile	/^app_modules:$/;"	t
 appwlsmain.o	app/Makefile	/^appwlsmain.o: $(TARGET).c$/;"	t
-atlock	10mutex.c	/^    atomic_t atlock; \/*原子锁*\/$/;"	m	struct:linuxDEV	typeref:typename:atomic_t	file:
+atlock	int_linux.c	/^    atomic_t atlock; \/*原子锁*\/$/;"	m	struct:linuxDEV	typeref:typename:atomic_t	file:
 build	Makefile	/^build: driver_modules app_modules$/;"	t
-char_dev	10mutex.c	/^    struct cdev char_dev;   \/*字符类设备*\/$/;"	m	struct:linuxDEV	typeref:struct:cdev	file:
-class	10mutex.c	/^    struct class *class;    \/*类*\/$/;"	m	struct:linuxDEV	typeref:struct:class *	file:
+char_dev	int_linux.c	/^    struct cdev char_dev;   \/*字符类设备*\/$/;"	m	struct:linuxDEV	typeref:struct:cdev	file:
+class	int_linux.c	/^    struct class *class;    \/*类*\/$/;"	m	struct:linuxDEV	typeref:struct:class *	file:
 clean	Makefile	/^clean:$/;"	t
 clean	app/Makefile	/^clean:$/;"	t
-dev_stats	10mutex.c	/^    int dev_stats; \/*设备状态，0，设备未使用：>0，设备已经被使用*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
-devfops	10mutex.c	/^static struct file_operations devfops = {$/;"	v	typeref:struct:file_operations	file:
-devices	10mutex.c	/^    struct device *devices; \/*设备*\/$/;"	m	struct:linuxDEV	typeref:struct:device *	file:
-devid	10mutex.c	/^    dev_t devid;    \/*设备号*\/$/;"	m	struct:linuxDEV	typeref:typename:dev_t	file:
-devopen	10mutex.c	/^static int devopen(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
-devread	10mutex.c	/^static ssize_t devread(    struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
-devrelease	10mutex.c	/^static int devrelease(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
-devwrite	10mutex.c	/^static ssize_t devwrite(   struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
+dev_stats	int_linux.c	/^    int dev_stats; \/*设备状态，0，设备未使用：>0，设备已经被使用*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
+devfops	int_linux.c	/^static struct file_operations devfops = {$/;"	v	typeref:struct:file_operations	file:
+devices	int_linux.c	/^    struct device *devices; \/*设备*\/$/;"	m	struct:linuxDEV	typeref:struct:device *	file:
+devid	int_linux.c	/^    dev_t devid;    \/*设备号*\/$/;"	m	struct:linuxDEV	typeref:typename:dev_t	file:
+devopen	int_linux.c	/^static int devopen(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
+devread	int_linux.c	/^static ssize_t devread(    struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
+devrelease	int_linux.c	/^static int devrelease(struct inode *inode, struct file *filp)$/;"	f	typeref:typename:int	file:
+devwrite	int_linux.c	/^static ssize_t devwrite(   struct file *filp, $/;"	f	typeref:typename:ssize_t	file:
 driver_modules	Makefile	/^driver_modules:$/;"	t
-gpio_dev	10mutex.c	/^}gpio_dev;$/;"	t	typeref:struct:linuxDEV	file:
-led	10mutex.c	/^gpio_dev led;$/;"	v	typeref:typename:gpio_dev
-led_gpio	10mutex.c	/^    int led_gpio;   \/*led 所使用的GPIO编号*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
-linuxDEV	10mutex.c	/^typedef struct linuxDEV$/;"	s	file:
-main	app/app10mutex.c	/^int main(int count,char **str)$/;"	f	typeref:typename:int
-major	10mutex.c	/^    int major;  \/*主设备号*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
-minor	10mutex.c	/^    int minor;  \/*次设备号*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
-mutex_lock	10mutex.c	/^    struct mutex mutex_lock;  \/*互斥锁*\/$/;"	m	struct:linuxDEV	typeref:struct:mutex	file:
-nd	10mutex.c	/^    struct device_node *nd; \/*设备节点*\/$/;"	m	struct:linuxDEV	typeref:struct:device_node *	file:
-obj-m	Makefile	/^obj-m := 10mutex.o$/;"	m
-sema0	10mutex.c	/^    struct semaphore sema0; \/*信号量*\/$/;"	m	struct:linuxDEV	typeref:struct:semaphore	file:
-spinlock	10mutex.c	/^    spinlock_t spinlock; \/*自旋锁*\/$/;"	m	struct:linuxDEV	typeref:typename:spinlock_t	file:
-wlsdev_exit	10mutex.c	/^static void __exit wlsdev_exit(void)$/;"	f	typeref:typename:void __exit	file:
-wlsdevinit	10mutex.c	/^static int __init wlsdevinit(void)$/;"	f	typeref:typename:int __init	file:
+gpio_dev	int_linux.c	/^}gpio_dev;$/;"	t	typeref:struct:linuxDEV	file:
+gpio_number	int_linux.c	/^    int gpio_number;   \/* 所使用的GPIO编号*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
+led	int_linux.c	/^gpio_dev led;$/;"	v	typeref:typename:gpio_dev
+linuxDEV	int_linux.c	/^typedef struct linuxDEV$/;"	s	file:
+main	app/appint.c	/^int main(int count,char **str)$/;"	f	typeref:typename:int
+major	int_linux.c	/^    int major;  \/*主设备号*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
+minor	int_linux.c	/^    int minor;  \/*次设备号*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
+mutex_lock	int_linux.c	/^    struct mutex mutex_lock;  \/*互斥锁*\/$/;"	m	struct:linuxDEV	typeref:struct:mutex	file:
+nd	int_linux.c	/^    struct device_node *nd; \/*设备节点*\/$/;"	m	struct:linuxDEV	typeref:struct:device_node *	file:
+obj-m	Makefile	/^obj-m := int_linux.o$/;"	m
+sema0	int_linux.c	/^    struct semaphore sema0; \/*信号量*\/$/;"	m	struct:linuxDEV	typeref:struct:semaphore	file:
+spinlock	int_linux.c	/^    spinlock_t spinlock; \/*自旋锁*\/$/;"	m	struct:linuxDEV	typeref:typename:spinlock_t	file:
+timer	int_linux.c	/^    struct timer_list timer;    \/*定义一个定时器*\/$/;"	m	struct:linuxDEV	typeref:struct:timer_list	file:
+timer_function	int_linux.c	/^void timer_function(unsigned long arg)$/;"	f	typeref:typename:void
+timer_unlocked_ioctl	int_linux.c	/^static int timer_unlocked_ioctl(struct file *flip,$/;"	f	typeref:typename:int	file:
+timerperiod	int_linux.c	/^    int timerperiod;    \/*定时周期，单位ms*\/$/;"	m	struct:linuxDEV	typeref:typename:int	file:
+wlsdev_exit	int_linux.c	/^static void __exit wlsdev_exit(void)$/;"	f	typeref:typename:void __exit	file:
+wlsdevinit	int_linux.c	/^static int __init wlsdevinit(void)$/;"	f	typeref:typename:int __init	file:
