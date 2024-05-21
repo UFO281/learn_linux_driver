@@ -136,8 +136,18 @@ static irqreturn_t key0_handler(int irq,void *dev_id)
 {
     gpio_dev *dev = (gpio_dev *)dev_id;
     dev->curkeynum = 0;
+
+    /*将设备的标识信息（dev_id）存储到定时器结构体中的数据字段 (data) 中，
+    以便在定时器回调函数中能够访问到这个设备数据*/
     dev->timer.data = (volatile long)dev_id;
+
+
+    /*使用 mod_timer函数启动定时器，定时器周期为 10ms*/
     mod_timer(&dev->timer,jiffies+msecs_to_jiffies(10));
+
+    /*这行代码的作用是在中断处理程序执行完成后，
+    向内核表明这个中断已经被成功处理。这有助于内核正确管理中断，
+    并防止同一中断被重复处理*/
     return IRQ_RETVAL(IRQ_HANDLED);
 
 }
