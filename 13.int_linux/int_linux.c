@@ -71,8 +71,8 @@
 #define LinCdev_CNT     1           /*设备个数*/
 #define LinCdev_Name    "i.mx6ull-wls" /* 设备名*/
 
-#define KEY_VALUE     0XF0  /*按键值*/  
-#define INvakey       0x00  /*无效的按键值*/   
+#define KEY_VALUE     0X66  /*按键值*/  
+#define INvakey       0x55  /*无效的按键值*/   
 
 
 /**
@@ -108,7 +108,6 @@ typedef struct linuxDEV
     int minor;  /*次设备号*/
     struct device_node *nd; /*设备节点*/
     int gpio_number;   /*所使用的GPIO编号 eg:GPIO1_IO05*/
-    atomic_t key_va; /*原子锁*/
     int dev_stats; /*设备状态，0，设备未使用：>0，设备已经被使用*/
     spinlock_t spinlock; /*自旋锁*/
     struct semaphore sema0; /*信号量*/
@@ -126,9 +125,61 @@ gpio_dev key;
 
 
 
+/**
+ * @brief IO ISR 开启定时器，延时10ms
+ *          定时按键用于消抖
+ * @param irq 中断号
+ * @param dev_id 设备结构
+ * @return irqreturn_t 中断执行结果
+ */
+static irqreturn_t key0_handler(int irq,void *dev_id)
+{
+    gpio_dev *dev = (gpio_dev *)dev_id;
+    dev->curkeynum = 0;
+    dev->timer.data = (volatile long)dev_id;
+    mod_timer(&dev->timer,jiffies+msecs_to_jiffies(10));
+    return IRQ_RETVAL(IRQ_HANDLED);
+
+}
+
+
+
+/**
+ * @brief 定时器服务函数，用于消抖，定时器到了之后
+ *      再次读取按键值，如果按键还是处于按下状态就表示按键有效
+ * 
+ * @param arg 设备结构变量
+ */
+void timer_function(unsigned long arg)
+{
+
+    unsigned char value;
+    unsigned char num;
+    IRQ_IO *keydesc;
+    gpio_dev *dev = (gpio_dev *)arg;
+
+    num = dev->curkeynum;
+    keydesc = &dev->irqkeydesc[num];
+
+    value = gpio_get_value(keydesc->gpio);
+    if (value == 0)
+    {
+        atomic_set(&dev->keyvalue,keydesc->value);
+    }
+    else
+    {
+        atomic_set(&dev->keyvalue,0x80|keydesc->value); /*按键松开*/
+        atomic_set(&dev->releasekey,1);/*标记松开按键*/
+    }
+
+}
+
+
 static int keyio_init(void)
 {
     int ret;
+    int i=0;
+
     /*1. 获取key在设备树中的节点*/
     key.nd = of_find_node_by_path("/key");
     if (key.nd==NULL)
@@ -141,27 +192,61 @@ static int keyio_init(void)
         printk("Driver: key OK!\r\n");
         
     }
-    
+
     /*2. 获取设备树中的GPIO属性，得到key所使用的key编号*/
-    key.gpio_number = of_get_named_gpio(key.nd,"key-gpio",0);
-    if (key.gpio_number<0)
+    for ( i = 0; i < 1; i++)
     {
-        printk("Driver: can't get key-gpio!\n");
-        return -ENAVAIL;
-    }
-    else
-    {
-        printk("Driver: key-gpio num = %d!\n",key.gpio_number);     
+        key.irqkeydesc[i].gpio = of_get_named_gpio(key.nd,"key-gpio",i);
+        if (key.irqkeydesc[i].gpio<0)
+        {
+            printk(" can't get key%d \r\n",i);
+        }
+        
     }
 
-    gpio_request(key.gpio_number,"key0");   /*请求GPIO*/
-
-    /*3.设置key IO为输入mode*/        
-    ret = gpio_direction_input(key.gpio_number);
-    if (ret<0)
+    /*3.设置key IO mode for int*/
+    for ( i = 0; i < 1; i++)
     {
-        printk("Driver: can't set gpio!!\r\n");
+        memset(key.irqkeydesc[i].name ,0, sizeof(key.irqkeydesc[i].name) );
+        sprintf(key.irqkeydesc[i].name,"key%d",i);
+        gpio_request(key.irqkeydesc[i].gpio,key.irqkeydesc->name);   /*请求GPIO*/
+        ret = gpio_direction_input(key.irqkeydesc[i].gpio);
+        if (ret<0)
+        {
+            printk("Driver: can't set gpio!!\r\n");
+        }
+
+        /*从设备树中获取按键 IO 对应的中断号*/
+        key.irqkeydesc[i].irq_label = irq_of_parse_and_map(key.nd,i);
+        // key.irqkeydesc[i].irq_label = gpio_to_irq(key.irqkeydesc[i].gpio);
+        printk("key%d:gpio=%d,irq_label=%d \r\n",i,key.irqkeydesc[i].gpio,
+                                                key.irqkeydesc[i].irq_label);
+
     }
+            
+    /*申请中断*/
+    key.irqkeydesc[0].handler_f = key0_handler;
+    key.irqkeydesc[0].value = KEY_VALUE;
+
+    for ( i = 0; i < 1; i++)
+    {
+        ret = request_irq(  key.irqkeydesc[i].irq_label,
+                            key.irqkeydesc[i].handler_f,
+                            IRQF_TRIGGER_FALLING|IRQF_TRIGGER_RISING,
+                            key.irqkeydesc[i].name,
+                            &key            
+                        );
+        if (ret<0)
+        {
+            printk("irq %d request failed! \r\n",key.irqkeydesc[i].irq_label);
+            return -EFAULT;
+        }
+        
+    }
+    
+    /*创建定时器*/
+    init_timer(&key.timer);
+    key.timer.function = timer_function;
 
     return 0;
 }
@@ -178,16 +263,9 @@ static int keyio_init(void)
  */
 static int devopen(struct inode *inode, struct file *filp)
 {
-    int ret;
 
     printk("Driver: devopen 2! \r\n");
     filp->private_data = &key; /*设置私有数据*/
-
-    ret = keyio_init(); /*初始化按键IO*/
-    if (ret<0)
-    {
-        return ret;
-    }
 
     return 0;
 
@@ -212,29 +290,33 @@ static ssize_t devread(    struct file *filp,
 {   
 
     int ret;
-    unsigned char value;
-    gpio_dev *dev = filp->private_data;
+    unsigned char value=0;
+    unsigned char releasekey=0;
+    gpio_dev *dev = (gpio_dev *)filp->private_data;
 
-    // printk("Driver: devread 3!\r\n");
+    value = atomic_read(&dev->keyvalue);
+    releasekey = atomic_read(&dev->releasekey);
 
-    if (gpio_get_value(dev->gpio_number)==0)
+    if (releasekey)
     {
-        while ( !gpio_get_value(dev->gpio_number)) /*等待按键释放*/
+        if (value & 0x80)
         {
-            atomic_set(&dev->key_va,KEY_VALUE);
-            // printk("Driver: key0 yes!\r\n");
+            value &= ~0x80;
+            ret = copy_to_user(buf, &value, sizeof(value) );    
         }
+        else
+        {
+            return -EINVAL;
+        }
+        atomic_set(&dev->releasekey,0);/*按下标志清零 */
+
     }
-    else
+    else    
     {
-        atomic_set(&dev->key_va,INvakey);
-        // printk("Driver: key0 NO!\r\n");
-
+        return -EINVAL;
     }
-    value = atomic_read(&dev->key_va);
-    ret = copy_to_user(buf,&value,sizeof(value));/* value -> buf*/
 
-    return ret;
+    return 0;
 
 }
 
@@ -328,7 +410,7 @@ static struct file_operations devfops = {
     .owner = THIS_MODULE,
     .open = devopen,
     .read = devread,
-    // .write = devwrite,
+    .write = devwrite,
     .release = devrelease
 
 };
@@ -351,20 +433,22 @@ static struct file_operations devfops = {
 static int __init wlsdevinit(void)
 {
     
-    int ret = 0;
+    // int ret = 0;
+
     /*初始化原子变量*/
-    atomic_set(&key.key_va,INvakey);/*原子变量初始值为1*/
+    atomic_set(&key.keyvalue,INvakey);/*原子变量初始值为1*/
+    atomic_set(&key.releasekey,0);
+    keyio_init();
 
     printk("Driver: wlsdevinit 1! \r\n");
 
     /*初始化 互斥锁*/
     // mutex_init(&key.mutex_lock);
 
-# if 1 /*key_use*/
-
     /*注册字符设备驱动*/
-    /*1. 创建设备号*/
-    if (key.major) /*申请了设备号*/
+
+    /*1. 申请创建设备号*/
+    if (key.major) 
     {
         /*将给定的主设备号和次设备号的值组合成 dev_t 类型的设备号*/
         key.devid = MKDEV(key.major,0);/* 次设备号0*/
@@ -404,7 +488,7 @@ static int __init wlsdevinit(void)
     printk("Driver: DEV_ID Register OK! key.major:%d minor:%d !\r\n",
             key.major,key.minor);
 
-    /*2. 初始化 char_dev*/
+    /*2. 注册 字符设备*/
     key.char_dev.owner = THIS_MODULE;
     cdev_init(  (struct cdev *)&key.char_dev,
                 (const struct file_operations *)&devfops
@@ -430,9 +514,6 @@ static int __init wlsdevinit(void)
         return PTR_ERR(key.devices);
     }
 
-#endif /*key_use*/
-
-
     return 0;
 
 }
@@ -448,10 +529,19 @@ static int __init wlsdevinit(void)
 static void __exit wlsdev_exit(void)
 {
 
+    size_t i = 0;
     printk("Driver: wlsdev_exit!\r\n");
 
-    /*注销字符设备*/
-    gpio_free(key.gpio_number);
+    /*删除定时器*/
+    del_timer_sync(&key.timer);
+
+    /*释放 中断*/
+    for (i = 0; i < 1; i++)
+    {
+        free_irq(key.irqkeydesc[i].irq_label,&key);
+        gpio_free(key.irqkeydesc[i].gpio);
+        
+    }
 
     cdev_del(&key.char_dev);/*删除char dev设备*/
 

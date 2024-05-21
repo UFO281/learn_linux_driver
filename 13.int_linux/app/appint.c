@@ -38,9 +38,7 @@ int main(int count,char **str)
     int fd;
     int ret;
     char *file_name=NULL;
-    unsigned int cmd;
-    unsigned int arg;
-    unsigned char data[100];
+    unsigned char data;
 
     // if (count!=3)
     // {
@@ -75,32 +73,19 @@ int main(int count,char **str)
 
     while (1)
     {
-        printf("input CMD:");
-        ret = scanf("%d",&cmd);
-        if (ret !=1 )
+        ret = read(fd, &data, sizeof(data) );
+        if (ret<0)  /*数据读错或者无效*/
         {
-            gets(data);
-        }
 
-        if (cmd==1)
-        {
-            cmd = CLOSE_CMD;
         }
-        else if (cmd==2)
-        {
-            cmd=OPEN_CMD;
-        }
-        else if (cmd==3)
-        {
-            cmd=SETPERIOD_CMD;
-            printf("input timer period:");
-            ret = scanf("%d",&arg);
-            if (ret!=1)
+        else{ /*数据正确*/
+
+            if (data)
             {
-                gets(data);
-            }            
-        }
-        ioctl(fd,cmd,arg);
+                printf("key value = %#X\r\n",data);
+            }
+            
+        }        
         
     }
     
