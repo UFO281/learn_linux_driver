@@ -1,0 +1,88 @@
+/* wavedown 波形图教程
+*/
+{ 
+    signal: [
+
+        { name: "Clock", wave: 'P......' },
+        { name: "DATa", wave: 'p.......' },
+        // { name: "nclk", wave: 'n.......' },
+        // { name: "Nclk", wave: 'N.......' },
+        {},
+        {},
+        { name: 'clk0', wave: 'phnlPHNL' },
+        { name: 'clk1', wave: 'xhlhLHl.' },
+        { name: 'clk2', wave: 'hpHplnLn' },
+        { name: 'clk3', wave: 'nhNhplPl' },
+        { name: 'clk4', wave: 'xlh.L.Hx' },
+        { name: 'clk5', wave: 'xlh.L.Hx' },
+        { name: "clk",  wave: "P......" },
+        { name: "bus",  wave: "x.==.=x", data: ["head", "body", "tail", "data"] },
+        { name: "wire", wave: "0.1..0." },
+        {},
+        {},
+        { name: "Alfa", wave: "01.zx=ud.23.456789" },
+        {},
+        {},
+        { name: "clk",         wave: "p.....|..." },
+        { name: "Data",        wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+        { name: "Request",     wave: "0.1..0|1.0" },
+        {},
+        { name: "Acknowledge", wave: "1.....|01." },
+        {},
+        {},
+        {    name: 'clk',   wave: 'p..Pp..P'},
+        ['Master',
+            ['ctrl',
+            {name: 'write', wave: '01.0....'},
+            {name: 'read',  wave: '0...1..0'}
+            ],
+            {  name: 'addr',  wave: 'x3.x4..x', data: 'A1 A2'},
+            {  name: 'wdata', wave: 'x3.x....', data: 'D1'   },
+        ],
+        {},
+        ['Slave',
+            ['ctrl',
+            {name: 'ack',   wave: 'x01x0.1x'},
+            ],
+            {  name: 'rdata', wave: 'x.....4x', data: 'Q2'},
+        ],
+        {},
+        {},
+
+        { "name": "CK",  "wave": "P.......",                                                 "period":2   },
+        { "name": "CMD", "wave": "x.3x=x4x=x=x=x=x", "data" : "RAS NOP CAS NOP NOP NOP NOP", "phase" :0.5 },
+        { "name": "ADDR","wave": "x.=x..=x........", "data" : "ROW COL",                     "phase" :0.5 },
+        { "name": "DQS", "wave": "z.......0.1010z." },
+        { "name": "DQ",  "wave": "z.........5555z.", "data" : "D0 D1 D2 D3" },
+        {},
+        {},
+        { name: "clk",     wave: "p...." },
+        { name: "Data",    wave: "x345x",  data: ["head", "body", "tail"] },
+        { name: "Request", wave: "01..0" },
+        {},
+        {},
+        {},
+        {},
+        
+    ],
+
+    config: { hscale: 1 }, /*波形图 放大倍数*/
+    // signal: [
+    //     {name:'clk',         wave: 'p....' },
+    //     {name:'Data',        wave: 'x345x', data: 'a b c' },
+    //     {name:'Request',     wave: '01..0' }
+    //   ],
+    //    head:{
+    //      text:'WaveDrom example',
+    //      tick:0,
+    //      every:2
+    //    },
+    //    foot:{
+    //      text:'Figure 100',
+    //      tock:9
+    //    },
+      
+  
+}
+
+
