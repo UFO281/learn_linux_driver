@@ -58,10 +58,11 @@
 #include <linux/timer.h>
 #include <linux/of_irq.h>
 #include <linux/irq.h>
+#include <linux/wait.h>
+#include <linux/poll.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
-
 
 
 
@@ -69,7 +70,7 @@
 
 
 #define LinCdev_CNT     1           /*设备个数*/
-#define LinCdev_Name    "i.mx6ull-wls" /* 设备名*/
+#define LinCdev_Name    "noi.mx6ull-wls" /* 设备名*/
 
 #define KEY_VALUE     0X66  /*按键值*/  
 #define INvakey       0x55  /*无效的按键值*/   
@@ -324,28 +325,28 @@ static ssize_t devread(    struct file *filp,
         remove_wait_queue(&dev->r_wait,&wait);  /*将等待队列移除*/
         return ret;
     }
-
     
 #endif
 
-    DECLARE_WAITQUEUE(wait,current);/*定义一个等待队列*/
-    if (atomic_read(&dev->releasekey)==0)
+    // DECLARE_WAITQUEUE(wait,current);/*定义一个等待队列*/
+    if (filp->f_flags & O_NONBLOCK) /*非阻塞式访问*/
     {
-        add_wait_queue(&dev->r_wait,&wait);/*将等待队列，添加到等待队列中*/
-        __set_current_state(TASK_INTERRUPTIBLE);/*设置任务状态*/
-        schedule();/*进行一次任务切换*/
-        if (signal_pending(current)) /*判断是否为信号引起的唤醒*/
+        if (atomic_read(&dev->releasekey)==0) /*按键未按下*/
         {
-            ret = -ERESTARTSYS;
-            set_current_state(TASK_RUNNING); /* 设置任务为运行态*/
-            remove_wait_queue(&dev->r_wait,&wait);  /*将等待队列移除*/
-            return ret;
+            return -EAGAIN;
         }
-        __set_current_state(TASK_RUNNING);/*设置未运行的状态*/
-        remove_wait_queue(&dev->r_wait,&wait);
-
+        else
+        {
+            /*加入等待队列，等待被唤醒，也就是有按键按下*/
+            ret = wait_event_interruptible(dev->r_wait,atomic_read(&dev->releasekey));
+            if (ret)
+            {
+                return ret;
+            }
+        }        
+        
     }
-
+    
     value = atomic_read(&dev->keyvalue);
     releasekey = atomic_read(&dev->releasekey);
 
@@ -372,6 +373,31 @@ static ssize_t devread(    struct file *filp,
 
 }
 
+
+/**
+ * @brief poll 函数，用于处理非阻塞访问
+ * 
+ * @param filp 要打开的设备文件(文件描述符)
+ * @param wait 等待列表(poll_table)
+ * @return unsigned int 设备或者资源状态
+ */
+unsigned int wimx6ull_poll( struct file *filp,
+                            struct poll_table_struct *wait
+                        )
+{
+    unsigned int mask = 0;
+    gpio_dev *dev = (struct gpio*)filp->private_data;
+
+    poll_wait(filp,&dev->r_wait,wait);
+
+    if (atomic_read(&dev->releasekey) ) /*按键按下*/
+    {
+        mask = POLLIN | POLLRDNORM;     /*返回PLLN*/
+    }
+    
+    return mask;
+
+}
 
 
 
@@ -463,7 +489,8 @@ static struct file_operations devfops = {
     .open = devopen,
     .read = devread,
     .write = devwrite,
-    .release = devrelease
+    .release = devrelease,
+    .poll = wimx6ull_poll,
 
 };
 
