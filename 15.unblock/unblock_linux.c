@@ -228,9 +228,9 @@ static int keyio_init(void)
     {
         memset(key.irqkeydesc[i].name ,0, sizeof(key.irqkeydesc[i].name) );
         sprintf(key.irqkeydesc[i].name,"key%d",i);
-        gpio_request(key.irqkeydesc[i].gpio,key.irqkeydesc->name);   /*请求GPIO*/
+        gpio_request(key.irqkeydesc[i].gpio, key.irqkeydesc->name);   /*请求GPIO*/
         ret = gpio_direction_input(key.irqkeydesc[i].gpio);
-        if (ret<0)
+        if (ret<0) 
         {
             printk("Driver: can't set gpio!!\r\n");
         }
@@ -338,7 +338,8 @@ static ssize_t devread(    struct file *filp,
         else
         {
             /*加入等待队列，等待被唤醒，也就是有按键按下*/
-            ret = wait_event_interruptible(dev->r_wait,atomic_read(&dev->releasekey));
+            ret = wait_event_interruptible(dev->r_wait, 
+                                        atomic_read(&dev->releasekey));
             if (ret)
             {
                 return ret;
@@ -388,7 +389,7 @@ unsigned int wimx6ull_poll( struct file *filp,
     unsigned int mask = 0;
     gpio_dev *dev = (struct gpio*)filp->private_data;
 
-    poll_wait(filp,&dev->r_wait,wait);
+    poll_wait(filp, &dev->r_wait, wait);
 
     if (atomic_read(&dev->releasekey) ) /*按键按下*/
     {
