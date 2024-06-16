@@ -7,5 +7,9 @@
     "settings": {
         "commentTranslate.targetLanguage": "zh-CN",
         "commentTranslate.source": "Baidu"
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": []
     }
 }

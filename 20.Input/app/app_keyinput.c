@@ -1,9 +1,9 @@
 /**
- * @file app_plat.c
+ * @file app_keyinput.c
  * @author wls (ufo281@outlook.com) 
  * @brief 
  * @version 1.0
- * @date 2024-06-08
+ * @date 2024-06-16
  * 
  * @copyright Copyright (c) 2024
  * 
@@ -12,15 +12,17 @@
 #include "unistd.h"
 #include "sys/types.h"
 #include "sys/stat.h"
+#include "sys/ioctl.h"
 #include "fcntl.h"
 #include "stdlib.h"
 #include "string.h"
 #include <poll.h>
-#include "sys/select.h"
-#include "sys/time.h"
-#include "linux/ioctl.h"
-#include "signal.h"
+#include <sys/select.h>
+#include <sys/time.h>
+#include <signal.h>
+#include <fcntl.h>
 #include <linux/input.h>
+
 
 
 /* 定义一个input_event变量,存放输入事件信息  */
@@ -40,7 +42,7 @@ int main(int count,char **str)
 
     printf("APP: Running ok! \r\n");
 
-    int fd, retvalue;
+    int fd;
     int err = 0;
     char *file_name;
 
@@ -56,6 +58,8 @@ int main(int count,char **str)
  
     while (1)
     {
+        printf("APP: Action read! \r\n");
+
         err = read(fd,&inputevent,sizeof(inputevent));
         if (err>0) /*read ok*/
         {
@@ -87,8 +91,10 @@ int main(int count,char **str)
         }
         else
         {
-            printf(" read data error!\r\n");
+            printf("APP: read data error!\r\n");
         }
+
+
 
     }
 
